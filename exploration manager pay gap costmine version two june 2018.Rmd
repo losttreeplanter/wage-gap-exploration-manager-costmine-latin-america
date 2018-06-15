@@ -1,0 +1,97 @@
+---
+title: "blank"
+
+
+
+---
+
+ 
+
+```{r}
+library(tidyverse)
+
+
+library(readr)
+rawexpmngr2 <- read_csv("C:/Users/Admin/Downloads/Exploration manager pay Sue Kihn June 2018 - Sheet2.csv")
+View(rawexpmngr2)
+glimpse(rawexpmngr2)
+
+
+
+```
+
+
+
+
+
+
+Let's do some filtering and factoring
+
+```{r}
+
+factorfilter2 <- rawexpmngr2 %>% filter(!Country %in% c("Venezuela", "Suriname", "Ecuador", "Chile"))
+
+#factorfilter$Country=factor(factorfilter$Country, levels=c("Bolivia", "Colombia", "Argentina", "Peru", "Guyana","Brazil"))
+
+
+
+
+factorfilter2$Country=factor(factorfilter$Country, levels=c("Brazil","Guyana","Peru","Argentina","Colombia","Bolivia"))
+
+```
+
+
+
+
+
+K. Let's add guide. 
+
+
+
+
+
+
+```{r}
+
+
+library(scales)
+library(showtext)
+library(extrafont)
+
+
+q <- ggplot(factorfilter2, aes(x=Country))+
+#  geom_segment(aes(y=Salary,yend=Salary, x=Country, xend=Country), size=2, colour="darkgrey")+
+  geom_segment(data=factorfilter, aes(y=AvgAnnualSalaryUSDExpatriates,yend=AvgAnnualSalaryUSDNationals, x=Country, xend=Country), size=2, colour="darkgrey")+
+  geom_point(aes(y=Salary, color=NatorExp), size=5)+
+#  geom_text(aes(y=Salary, label=dollar(Salary)), hjust = -.3, family="Montserrat")+
+  geom_text(data=factorfilter,aes(y=AvgAnnualSalaryUSDNationals, label=dollar(AvgAnnualSalaryUSDNationals)), hjust = 1.3, family="Montserrat")+
+  geom_text(data=factorfilter,aes(y=AvgAnnualSalaryUSDExpatriates, label=dollar(AvgAnnualSalaryUSDExpatriates)), hjust = -.3, family="Montserrat")+
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 210000), labels = scales::dollar) +
+  theme_minimal(base_size=16, base_family="Montserrat")+
+  labs(title="Exploration Manager Salary Gap", subtitle="Average Annual Salary in US Dollars",x="", y="", caption="Mining Intelligence", fill="") +
+  theme(plot.title = element_text(size = rel(2), family="Zilla Slab Light"), legend.title=element_blank()) +
+  scale_colour_manual(values=c("#99d594","#fc8d59"))
+#  theme(legend.position="none")
+
+q
+
+
+  ggsave("latamgap7.pdf", plot=q, width=250, height=200, units="mm")
+  
+  
+#getwd()
+
+
+```
+
+
+
+
+
+
+
+
+
+
+

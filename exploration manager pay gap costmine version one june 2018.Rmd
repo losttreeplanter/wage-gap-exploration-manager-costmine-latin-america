@@ -1,0 +1,103 @@
+---
+title: "blank"
+
+
+
+---
+
+ 
+
+```{r}
+library(tidyverse)
+
+
+library(readr)
+rawexpmngr <- read_csv("C:/Users/Admin/Downloads/Exploration manager pay Sue Kihn June 2018 - Sheet1.csv")
+View(rawexpmngr)
+glimpse(rawexpmngr)
+
+
+
+```
+
+
+
+Let's chart. 
+
+
+```{r}
+
+ggplot(rawexpmngr, aes(x=Country))+
+  geom_point(aes(y=AvgAnnualSalaryUSDNationals))+
+  geom_point(aes(y=AvgAnnualSalaryUSDExpatriates))+
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 200000))
+
+
+
+```
+
+
+
+Let's do some filtering and factoring
+
+```{r}
+
+factorfilter <- rawexpmngr %>% filter(!Country %in% c("Venezuela", "Suriname", "Ecuador", "Chile"))
+
+#factorfilter$Country=factor(factorfilter$Country, levels=c("Bolivia", "Colombia", "Argentina", "Peru", "Guyana","Brazil"))
+
+
+
+
+factorfilter$Country=factor(factorfilter$Country, levels=c("Brazil","Guyana","Peru","Argentina","Colombia","Bolivia"))
+
+```
+
+
+
+Add connecting line. Use geom_segment  
+
+https://stackoverflow.com/questions/5831838/ggplot2-geom-line-should-point-at-specified-value?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+
+```{r}
+
+
+library(scales)
+library(showtext)
+library(extrafont)
+
+
+q <- ggplot(factorfilter, aes(x=Country))+
+  geom_segment(aes(y=AvgAnnualSalaryUSDExpatriates,yend=AvgAnnualSalaryUSDNationals, x=Country, xend=Country), size=2, colour="darkgrey")+
+  geom_point(aes(y=AvgAnnualSalaryUSDNationals), color="#fc8d59", size=5)+
+  geom_point(aes(y=AvgAnnualSalaryUSDExpatriates), color="#99d594",size=5)+
+  geom_text(aes(y=AvgAnnualSalaryUSDNationals, label=dollar(AvgAnnualSalaryUSDNationals)), hjust = 1.3, family="Montserrat")+
+  geom_text(aes(y=AvgAnnualSalaryUSDExpatriates, label=dollar(AvgAnnualSalaryUSDExpatriates)), hjust = -.3, family="Montserrat")+
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 210000), labels = scales::dollar) +
+  theme_minimal(base_size=16, base_family="Montserrat")+
+  labs(title="Exploration Manager Salary Gap", subtitle="Average Annual Salary in USD of Nationals Compared to Expatriates",x="", y="", caption="Data from Mining Intelligence") +
+  theme(plot.title = element_text(size = rel(2), family="Zilla Slab Light"))
+#  theme(legend.position="none")
+
+
+  ggsave("latamgap2.pdf", plot=q, width=250, height=200, units="mm")
+  
+  
+getwd()
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
